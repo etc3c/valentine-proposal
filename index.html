@@ -34,9 +34,10 @@
 
     <!-- Screen 1: The Question -->
     <div id="questionScreen" class="text-center w-full max-w-2xl px-4 flex flex-col items-center gap-8">
-        <img src="https://media.tenor.com/nZ12XF4c_lYAAAAi/mocha-bear-hearts.gif" 
-             alt="Bear with hearts" 
-             class="h-52 mix-blend-multiply mx-auto" />
+        <img id="mainImage" 
+             src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjBrampuY2diNTZxeWxwMXkyeHJyNGs2MXB0enhwc3ZjczBhcGY1dCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vDhDcIEmShbUI/giphy.gif" 
+             alt="Cute sad cat" 
+             class="h-64 object-contain mx-auto transition-all duration-300 rounded-xl" />
         
         <h1 class="text-4xl md:text-5xl font-bold text-rose-600 leading-tight">
             Will you be my Valentine? 🌹
@@ -53,7 +54,8 @@
             <!-- No Button -->
             <button id="noButton" 
                     onclick="handleNoClick()"
-                    class="rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-8 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-rose-300 transition-all duration-300">
+                    onmouseover="moveButtonOnHover()"
+                    class="rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-8 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-rose-300 transition-all duration-300 z-50 whitespace-nowrap">
                 No
             </button>
         </div>
@@ -61,9 +63,9 @@
 
     <!-- Screen 2: Success (Hidden by default) -->
     <div id="successScreen" class="hidden text-center w-full px-4 flex-col items-center gap-6">
-        <img src="https://media.tenor.com/gUiu1zyqE3gAAAAi/bear-kiss-bear-kisses.gif" 
-             alt="Bears kissing" 
-             class="h-64 mb-4 mx-auto" />
+        <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGZjN3l1M21ia2phZGU0eTdqcHNzeDRqMG9qN3IwNHM4Njh0MTZibyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qPoCDRpGkRG5a/giphy.gif" 
+             alt="Happy celebrating" 
+             class="h-64 object-contain mb-4 mx-auto rounded-xl" />
         
         <div class="text-4xl font-bold text-rose-600 animate-bounce">
             Yayyyy!! I love you!! ❤️
@@ -79,12 +81,17 @@
 
     <script>
         // --- Logic ---
+        
         const phrases = [
-            "No", "Are you sure?", "Really sure?", "Think again!", "Last chance!", 
-            "Surely not?", "You might regret this!", "Give it another thought!", 
-            "Are you absolutely certain?", "This could be a mistake!", "Have a heart!", 
-            "Don't be so cold!", "Change of heart?", "Wouldn't you reconsider?", 
-            "Is that your final answer?", "You're breaking my heart ;(", "Plsss? :("
+            "No",
+            "Are you sure?",
+            "Really sure?",
+            "Are u 100% sure?",
+            "Baby please...",
+            "Just think about it!!!",
+            "If you say no, I will be really sad",
+            "I will be very sad",
+            "I and Juno will be sad"
         ];
 
         let noCount = 0;
@@ -92,16 +99,51 @@
         function handleNoClick() {
             noCount++;
             
-            // 1. Change text on the No button
             const noButton = document.getElementById('noButton');
-            const textIndex = Math.min(noCount, phrases.length - 1);
-            noButton.innerText = phrases[textIndex];
+
+            // Logic: If we have reached the end of phrases, hide the button on the NEXT click
+            if (noCount >= phrases.length) {
+                // If she clicks "No" when it says "I and Juno will be sad", remove the button
+                noButton.classList.add('hidden');
+                return;
+            }
+
+            // 1. Change text on the No button
+            // Use the phrase matching the current count
+            noButton.innerText = phrases[noCount];
 
             // 2. Make the Yes button bigger
             const yesButton = document.getElementById('yesButton');
             const currentSize = parseFloat(window.getComputedStyle(yesButton).fontSize);
-            const newSize = currentSize * 1.5; // Grow by 50% each time
+            // Grow slightly less aggressive so text stays visible longer (1.35x instead of 1.5x)
+            const newSize = currentSize * 1.35; 
             yesButton.style.fontSize = `${newSize}px`;
+
+            // 3. Move the No Button randomly
+            moveNoButton();
+        }
+
+        function moveButtonOnHover() {
+            // Optional: You can uncomment this if you want it to move when she tries to touch it!
+            // if (noCount > 5) moveNoButton(); 
+        }
+
+        function moveNoButton() {
+            const noButton = document.getElementById('noButton');
+            
+            // Ensure button is absolute/fixed so it can move freely and sit ON TOP of Yes button
+            noButton.style.position = 'fixed'; 
+            
+            // Calculate random position
+            const maxWidth = window.innerWidth - noButton.offsetWidth;
+            const maxHeight = window.innerHeight - noButton.offsetHeight;
+            
+            // Ensure we don't go off screen
+            const randomX = Math.max(0, Math.random() * maxWidth);
+            const randomY = Math.max(0, Math.random() * maxHeight);
+            
+            noButton.style.left = randomX + 'px';
+            noButton.style.top = randomY + 'px';
         }
 
         function handleYesClick() {
