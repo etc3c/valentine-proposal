@@ -1,1 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will you be my Valentine?</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden; /* Prevent scrolling when button gets huge */
+        }
+        
+        /* Smooth transitions for button sizing */
+        #yesButton {
+            transition: all 0.3s ease;
+        }
 
+        /* Confetti animation */
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(-10vw) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) translateX(10vw) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: absolute;
+            animation: fall linear forwards;
+        }
+    </style>
+</head>
+<body class="bg-[#ffe4e6] min-h-screen flex flex-col items-center justify-center selection:bg-rose-500 selection:text-white">
+
+    <!-- Screen 1: The Question -->
+    <div id="questionScreen" class="text-center w-full max-w-2xl px-4 flex flex-col items-center gap-8">
+        <img src="https://media.tenor.com/nZ12XF4c_lYAAAAi/mocha-bear-hearts.gif" 
+             alt="Bear with hearts" 
+             class="h-52 mix-blend-multiply mx-auto" />
+        
+        <h1 class="text-4xl md:text-5xl font-bold text-rose-600 leading-tight">
+            Will you be my Valentine? 🌹
+        </h1>
+
+        <div class="flex flex-wrap flex-col md:flex-row gap-4 items-center justify-center w-full relative">
+            <!-- Yes Button -->
+            <button id="yesButton" 
+                    onclick="handleYesClick()"
+                    class="rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-green-300 z-10">
+                Yes
+            </button>
+
+            <!-- No Button -->
+            <button id="noButton" 
+                    onclick="handleNoClick()"
+                    class="rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-8 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-rose-300 transition-all duration-300">
+                No
+            </button>
+        </div>
+    </div>
+
+    <!-- Screen 2: Success (Hidden by default) -->
+    <div id="successScreen" class="hidden text-center w-full px-4 flex-col items-center gap-6">
+        <img src="https://media.tenor.com/gUiu1zyqE3gAAAAi/bear-kiss-bear-kisses.gif" 
+             alt="Bears kissing" 
+             class="h-64 mb-4 mx-auto" />
+        
+        <div class="text-4xl font-bold text-rose-600 animate-bounce">
+            Yayyyy!! I love you!! ❤️
+        </div>
+        
+        <p class="text-xl text-rose-400">
+            (I knew you would say yes 😉)
+        </p>
+    </div>
+
+    <!-- Background Decoration -->
+    <div id="backgroundHearts" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden"></div>
+
+    <script>
+        // --- Logic ---
+        const phrases = [
+            "No", "Are you sure?", "Really sure?", "Think again!", "Last chance!", 
+            "Surely not?", "You might regret this!", "Give it another thought!", 
+            "Are you absolutely certain?", "This could be a mistake!", "Have a heart!", 
+            "Don't be so cold!", "Change of heart?", "Wouldn't you reconsider?", 
+            "Is that your final answer?", "You're breaking my heart ;(", "Plsss? :("
+        ];
+
+        let noCount = 0;
+
+        function handleNoClick() {
+            noCount++;
+            
+            // 1. Change text on the No button
+            const noButton = document.getElementById('noButton');
+            const textIndex = Math.min(noCount, phrases.length - 1);
+            noButton.innerText = phrases[textIndex];
+
+            // 2. Make the Yes button bigger
+            const yesButton = document.getElementById('yesButton');
+            const currentSize = parseFloat(window.getComputedStyle(yesButton).fontSize);
+            const newSize = currentSize * 1.5; // Grow by 50% each time
+            yesButton.style.fontSize = `${newSize}px`;
+        }
+
+        function handleYesClick() {
+            // 1. Hide Question Screen
+            document.getElementById('questionScreen').classList.add('hidden');
+            
+            // 2. Show Success Screen
+            const successScreen = document.getElementById('successScreen');
+            successScreen.classList.remove('hidden');
+            successScreen.classList.add('flex'); // Add flex back to center items
+
+            // 3. Launch Confetti
+            createConfetti();
+        }
+
+        // --- Effects ---
+
+        // Floating Hearts Background
+        function createFloatingHearts() {
+            const container = document.getElementById('backgroundHearts');
+            for(let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.className = 'absolute text-2xl opacity-40 animate-bounce';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDuration = (3 + Math.random() * 4) + 's';
+                heart.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(heart);
+            }
+        }
+
+        // Confetti Burst
+        function createConfetti() {
+            const colors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7'];
+            const container = document.body;
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // Random heart SVG
+                confetti.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="${colors[Math.floor(Math.random() * colors.length)]}" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
+                
+                // Random positioning and animation
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = -10 + 'vh';
+                confetti.style.animationDuration = (2 + Math.random() * 3) + 's';
+                
+                container.appendChild(confetti);
+            }
+        }
+
+        // Initialize background on load
+        createFloatingHearts();
+    </script>
+</body>
+</html>
